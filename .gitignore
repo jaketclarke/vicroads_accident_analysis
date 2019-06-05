@@ -1,2 +1,7 @@
 vicroads_data/ACCIDENT/*.csv
 config.local.ini
+tac/__pycache__/tacpostgresql.cpython-37.pyc
+tac/__pycache__/config.cpython-37.pyc
+tac/config.pyc
+.vscode/.ropeproject/config.py
+.vscode/settings.json
