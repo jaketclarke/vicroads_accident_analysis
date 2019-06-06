@@ -1,8 +1,9 @@
 import psycopg2
+import psycopg2.extras
+from collections import namedtuple
 from config import *
 
-class dbPostgreSQLConnection(object):
-
+class PostgresDB(object):
     def __init__(self):
         self.params = parseConfig('PostgreSQL')
         self._db_connection = psycopg2.connect(**self.params)
@@ -30,6 +31,20 @@ class dbPostgreSQLConnection(object):
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
 
+    def bulkinsert(self, data):
+        insert_query =  """INSERT INTO TAC_data_raw(startdate, enddate, needle, val)
+            VALUES(%s)
+        """
+
+        try:
+            with self._db_cur as cursor:
+                cursor.copy_from(data, 'TAC_data_raw', columns = ('startdate', 'enddate', 'needle', 'val'))
+                psycopg2.extras.execute_values(cursor, insert_query, data, template=None, page_size=1000)
+            
+            self._db_connection.commit()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+
     def insert(self, startdate, enddate, needle, val):
         try:
             self._db_cur.execute("""
@@ -47,4 +62,4 @@ class dbPostgreSQLConnection(object):
         self._db_connection.close()
 
 if __name__ == '__main__':
-    dbPostgreSQLConnection().test()
+    PostgresDB().test()
